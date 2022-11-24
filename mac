@@ -128,6 +128,7 @@ brew "zsh"
 brew "cmake"
 brew "zsh-completions"
 brew "tree"
+brew "bat"
 
 # Heroku
 brew "heroku/brew/heroku"
