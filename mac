@@ -146,7 +146,6 @@ brew "poppler"
 # Programming language prerequisites and package managers
 brew "libyaml" # should come after openssl
 brew "coreutils"
-brew "yarn"
 cask "gpg-suite-no-mail"
 brew "ansible"
 
@@ -216,6 +215,12 @@ bundle config build.mysql2 --with-mysql-config=$(which mysql_config)
 
 fancy_echo "Installing latest Node ..."
 install_asdf_language "nodejs"
+corepack enable
+corepack prepare yarn@stable --activate
+asdf reshim nodejs
+
+fancy_echo "Installing latest Python ..."
+install_asdf_language "python"
 
 if [ -f "$HOME/.laptop.local" ]; then
   fancy_echo "Running your customizations from ~/.laptop.local ..."
