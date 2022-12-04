@@ -244,6 +244,13 @@ if [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
    git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 fi
 
+if [ ! -d "$HOME/terminfo.src" ]; then
+  fancy_echo "Setup tmux-256color to enable italics in TMUX ..."
+  curl -fsSL https://invisible-island.net/datafiles/current/terminfo.src.gz -o "$HOME/terminfo.src.gz"
+  gunzip "$HOME/terminfo.src.gz"
+  tic -xe tmux-256color "$HOME/terminfo.src"
+fi
+
 if [ -d "$HOME/dotfiles" ]; then
   fancy_echo "Updating rc files..."
   env RCRC=$HOME/dotfiles/rcrc rcup
