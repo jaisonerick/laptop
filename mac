@@ -70,7 +70,7 @@ update_shell() {
 
 case "$SHELL" in
   */zsh)
-    if [ "$(command -v zsh)" != '/usr/local/bin/zsh' ] ; then
+    if [ "$(command -v zsh)" != "$HOMEBREW_PREFIX/bin/zsh" ] ; then
       update_shell
     fi
     ;;
@@ -79,6 +79,19 @@ case "$SHELL" in
     ;;
 esac
 
+# checks architecture
+if [ "$(uname -m)" = "arm64" ]
+  then
+  # checks if Rosetta is already installed
+  if ! pkgutil --pkg-info=com.apple.pkg.RosettaUpdateAuto > /dev/null 2>&1
+  then
+    echo "Installing Rosetta"
+    # Installs Rosetta2
+    softwareupdate --install-rosetta --agree-to-license
+  else
+    echo "Rosetta is installed"
+  fi
+fi
 
 gem_install_or_update() {
   if gem list "$1" --installed > /dev/null; then
@@ -147,14 +160,13 @@ cask "iterm2"
 
 # Databases
 brew "postgresql@14", restart_service: :changed
-brew "mariadb", restart_service: :changed
 brew "redis", restart_service: :changed
 EOF
 
 fancy_echo "Configuring asdf version manager ..."
 if [ ! -d "$HOME/.asdf" ]; then
   brew install asdf
-  append_to_zshrc "source $(brew --prefix asdf)/asdf.sh" 1
+  append_to_zshrc "source $(brew --prefix asdf)/libexec/asdf.sh" 1
 fi
 
 alias install_asdf_plugin=add_or_update_asdf_plugin
@@ -169,8 +181,8 @@ add_or_update_asdf_plugin() {
   fi
 }
 
-# shellcheck disable=SC1090
-. "$(brew --prefix asdf)/asdf.sh"
+# shellcheck disable=SC1091
+. "$(brew --prefix asdf)/libexec/asdf.sh"
 add_or_update_asdf_plugin "ruby" "https://github.com/asdf-vm/asdf-ruby.git"
 add_or_update_asdf_plugin "nodejs" "https://github.com/asdf-vm/asdf-nodejs.git"
 add_or_update_asdf_plugin "python" "https://github.com/danhper/asdf-python.git"
@@ -185,10 +197,6 @@ install_asdf_language() {
     asdf global "$language" "$version"
   fi
 }
-
-brew services stop mariadb
-mysql_install_db
-brew services start mariadb
 
 fancy_echo "Installing latest Ruby ..."
 install_asdf_language "ruby"
@@ -212,7 +220,7 @@ install_asdf_language "python"
 
 if [ -f "$HOME/.laptop.local" ]; then
   fancy_echo "Running your customizations from ~/.laptop.local ..."
-  # shellcheck disable=SC1090
+  # shellcheck disable=SC1091
   . "$HOME/.laptop.local"
 fi
 

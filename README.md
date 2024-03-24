@@ -12,7 +12,9 @@ Requirements
 
 We support:
 
-* macOS Monterey (12.3) on Apple Silicon and Intel
+* macOS Sonoma (14.x) on Apple Silicon and Intel
+* macOS Ventura (13.x) on Apple Silicon and Intel
+* macOS Monterey (12.x) on Apple Silicon and Intel
 
 Older versions may work but aren't regularly tested.
 Bug reports for older versions are welcome.
@@ -110,6 +112,7 @@ Programming languages, package managers, and configuration:
 * [Node.js] and [npm], for running apps and installing JavaScript packages
 * [Ruby] stable for writing general-purpose code
 * [Yarn] for managing JavaScript packages
+* [Rosetta 2] for running tools that are not supported in Apple silicon processors
 
 [Bundler]: http://bundler.io/
 [ImageMagick]: http://www.imagemagick.org/
@@ -118,6 +121,7 @@ Programming languages, package managers, and configuration:
 [asdf-vm]: https://github.com/asdf-vm/asdf
 [Ruby]: https://www.ruby-lang.org/en/
 [Yarn]: https://yarnpkg.com/en/
+[Rosetta 2]: https://developer.apple.com/documentation/apple-silicon/about-the-rosetta-translation-environment
 
 Databases:
 
@@ -164,7 +168,6 @@ fi
 
 fancy_echo "Cleaning up old Homebrew formulae ..."
 brew cleanup
-brew cask cleanup
 
 if [ -r "$HOME/.rcrc" ]; then
   fancy_echo "Updating dotfiles ..."
@@ -185,8 +188,18 @@ for more customization examples.
 Contributing
 ------------
 
+Thank you, [contributors]!
+
+[contributors]: https://github.com/thoughtbot/laptop/graphs/contributors
+
+By participating in this project,
+you agree to abide by the thoughtbot [code of conduct].
+
+[code of conduct]: https://thoughtbot.com/open-source-code-of-conduct
+
 Edit the `mac` file.
 Document in the `README.md` file.
+Update the `CHANGELOG`.
 Follow shell style guidelines by using [ShellCheck] and [Syntastic].
 
 ```sh
@@ -207,35 +220,28 @@ the script each time on a fresh install thats ready to go.
 
 [UTM]: https://mac.getutm.app
 
-Thank you, [contributors]!
-
-[contributors]: https://github.com/thoughtbot/laptop/graphs/contributors
-
-By participating in this project,
-you agree to abide by the thoughtbot [code of conduct].
-
-[code of conduct]: https://thoughtbot.com/open-source-code-of-conduct
-
 License
 -------
 
-Laptop is © 2011-2022 thoughtbot, inc.
+Copyright © 2011 thoughtbot, inc.
 It is free software,
 and may be redistributed under the terms specified in the [LICENSE] file.
 
 [LICENSE]: LICENSE
 
-About thoughtbot
-----------------
+<!-- START /templates/footer.md -->
+## About thoughtbot
 
-![thoughtbot](https://thoughtbot.com/brand_assets/93:44.svg)
+![thoughtbot](https://thoughtbot.com/thoughtbot-logo-for-readmes.svg)
 
-Laptop is maintained and funded by thoughtbot, inc.
+This repo is maintained and funded by thoughtbot, inc.
 The names and logos for thoughtbot are trademarks of thoughtbot, inc.
 
-We are passionate about open source software.
+We love open source software!
 See [our other projects][community].
 We are [available for hire][hire].
 
 [community]: https://thoughtbot.com/community?utm_source=github
-[hire]: https://thoughtbot.com?utm_source=github
+[hire]: https://thoughtbot.com/hire-us?utm_source=github
+
+<!-- END /templates/footer.md -->
