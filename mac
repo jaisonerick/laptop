@@ -111,28 +111,21 @@ brew update --force # https://github.com/Homebrew/brew/issues/1151
 brew bundle --file=- <<EOF
 tap "thoughtbot/formulae"
 tap "homebrew/services"
-tap "heroku/brew"
 tap "homebrew/cask-fonts"
 
 # Unix
-brew "universal-ctags/universal-ctags/universal-ctags", args: ["HEAD"]
 brew "git"
-brew "svn"
 brew "openssl"
 brew "rcm"
-brew "the_silver_searcher"
+brew "ripgrep"
 brew "tmux"
-brew "vim"
+brew "neovim"
 brew "watchman"
 brew "zsh"
 brew "cmake"
 brew "zsh-completions"
 brew "tree"
 brew "bat"
-
-# Heroku
-brew "heroku/brew/heroku"
-brew "parity"
 
 # GitHub
 brew "gh"
@@ -146,8 +139,6 @@ brew "poppler"
 # Programming language prerequisites and package managers
 brew "libyaml" # should come after openssl
 brew "coreutils"
-cask "gpg-suite-no-mail"
-brew "ansible"
 
 # Applications
 cask "font-source-code-pro"
@@ -159,10 +150,6 @@ brew "postgresql@14", restart_service: :changed
 brew "mariadb", restart_service: :changed
 brew "redis", restart_service: :changed
 EOF
-
-fancy_echo "Update heroku binary ..."
-brew unlink heroku
-brew link --force heroku
 
 fancy_echo "Configuring asdf version manager ..."
 if [ ! -d "$HOME/.asdf" ]; then
@@ -186,6 +173,7 @@ add_or_update_asdf_plugin() {
 . "$(brew --prefix asdf)/asdf.sh"
 add_or_update_asdf_plugin "ruby" "https://github.com/asdf-vm/asdf-ruby.git"
 add_or_update_asdf_plugin "nodejs" "https://github.com/asdf-vm/asdf-nodejs.git"
+add_or_update_asdf_plugin "python" "https://github.com/danhper/asdf-python.git"
 
 install_asdf_language() {
   local language="$1"
