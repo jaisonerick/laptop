@@ -224,32 +224,33 @@ if [ -f "$HOME/.laptop.local" ]; then
   . "$HOME/.laptop.local"
 fi
 
-# if [ ! -d "$HOME/dotfiles" ]; then
-#   fancy_echo "Installing dotfiles ..."
-#   git clone git://github.com/jaisonerick/dotfiles.git "$HOME/dotfiles"
-#fi
+if [ ! -d "$HOME/dotfiles" ]; then
+  fancy_echo "Installing dotfiles ..."
+  mkdir -p "$HOME/code/jaisonerick"
+  git clone git://github.com/jaisonerick/dotfiles.git "$HOME/code/jaisonerick/dotfiles"
+fi
 
-#if [ ! -d "$HOME/.scm_breeze" ]; then
-#   fancy_echo "Installing SCM Breeze ..."
-#   git clone https://github.com/scmbreeze/scm_breeze.git ~/.scm_breeze
-#fi
+if [ ! -d "$HOME/.scm_breeze" ]; then
+  fancy_echo "Installing SCM Breeze ..."
+  git clone https://github.com/scmbreeze/scm_breeze.git ~/.scm_breeze
+fi
 
-#if [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
-#   fancy_echo "Installing Tmux Plugin Manager ..."
-#   mkdir -p ~/.tmux/plugins
-#   git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
-#fi
+if [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
+  fancy_echo "Installing Tmux Plugin Manager ..."
+  mkdir -p ~/.tmux/plugins
+  git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+fi
 
-#if [ ! -d "$HOME/terminfo.src" ]; then
-#  fancy_echo "Setup tmux-256color to enable italics in TMUX ..."
-#  curl -fsSL https://invisible-island.net/datafiles/current/terminfo.src.gz -o "$HOME/terminfo.src.gz"
-#  gunzip "$HOME/terminfo.src.gz"
-#  tic -xe tmux-256color "$HOME/terminfo.src"
-#fi
+if [ ! -d "$HOME/terminfo.src" ]; then
+ fancy_echo "Setup tmux-256color to enable italics in TMUX ..."
+ curl -fsSL https://invisible-island.net/datafiles/current/terminfo.src.gz -o "$HOME/terminfo.src.gz"
+ gunzip "$HOME/terminfo.src.gz"
+ tic -xe tmux-256color "$HOME/terminfo.src"
+fi
 
 if [ -d "$HOME/dotfiles" ]; then
   fancy_echo "Updating rc files..."
-  env RCRC=$HOME/dotfiles/rcrc rcup
+  env RCRC=$HOME/code/jaisonerick/dotfiles/rcrc rcup
 fi
 
 # reset -Q
