@@ -155,18 +155,35 @@ brew "coreutils"
 
 brew "openvpn"
 
+brew "mas"
+
 # Applications
 cask "font-source-code-pro"
 cask "font-lato"
 cask "iterm2"
 cask "claude-code"
 cask "cursor"
+cask "1password@nightly"
+cask "betterdisplay"
+cask "openvpn-connect"
 
 # Databases
 brew "postgresql@18", restart_service: :changed
 brew "mysql@9.4", restart_service: :changed
 brew "redis", restart_service: :changed
 EOF
+
+#  1Password for Safari  (8.11.16)
+mas install 1569813296
+
+#   Slack                 (4.46.104)
+mas install 803453959
+
+#   Things                (3.22.6)
+mas install 904280696
+
+# WhatsApp              (25.36.73)
+mas install 310633997  
 
 fancy_echo "Configuring asdf version manager ..."
 if [ ! -d "$HOME/.asdf" ]; then
