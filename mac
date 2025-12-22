@@ -32,6 +32,24 @@ append_to_zshrc() {
   fi
 }
 
+detect_host_app() {
+  local p="$PPID"
+  local comm=""
+  while [[ -n "$p" && "$p" -gt 1 ]]; do
+    comm="$(ps -o comm= -p "$p" 2>/dev/null | awk '{$1=$1};1' | awk -F/ '{print $NF}')"
+    case "$comm" in
+      Terminal|iTerm2|Code|Code\ -\ Insiders|Cursor|Warp|WezTerm|Alacritty)
+        echo "$comm"
+        return 0
+        ;;
+    esac
+    p="$(ps -o ppid= -p "$p" 2>/dev/null | awk '{$1=$1};1' || true)"
+  done
+  echo "your terminal app"
+}
+
+fancy_echo "$(detect_host_app)"
+
 # shellcheck disable=SC2154
 trap 'ret=$?; test $ret -ne 0 && printf "failed\n\n" >&2; exit $ret' EXIT
 
@@ -123,8 +141,6 @@ fancy_echo "Updating Homebrew formulas ..."
 brew update --force # https://github.com/Homebrew/brew/issues/1151
 brew bundle --file=- <<EOF
 tap "thoughtbot/formulae"
-tap "homebrew/services"
-tap "homebrew/cask-fonts"
 
 # Unix
 brew "git"
@@ -169,7 +185,7 @@ cask "openvpn-connect"
 
 # Databases
 brew "postgresql@18", restart_service: :changed
-brew "mysql@9.4", restart_service: :changed
+brew "mysql", restart_service: :changed
 brew "redis", restart_service: :changed
 EOF
 
@@ -192,6 +208,8 @@ if [ ! -d "$HOME/.asdf" ]; then
 else
   brew upgrade asdf
 fi
+
+source $(brew --prefix asdf)/libexec/asdf.sh
 
 alias install_asdf_plugin=add_or_update_asdf_plugin
 add_or_update_asdf_plugin() {
@@ -231,6 +249,7 @@ bundle config --global jobs $((number_of_cores - 1))
 
 fancy_echo "Installing latest Node ..."
 install_asdf_language "nodejs"
+npm install -g corepack
 corepack enable
 corepack prepare yarn@stable --activate
 asdf reshim nodejs
@@ -269,26 +288,80 @@ if [ ! -d "$HOME/terminfo.src" ]; then
 fi
 
 fancy_echo "Setting up github..."
-gh auth login
+if gh auth status >/dev/null 2>&1; then
+  fancy_echo "Github already logged in"
+else
+  fancy_echo "Logging in to Github"
+  gh auth login
+fi
 
 if [ ! -d "$HOME/code/jaisonerick/dotfiles" ]; then
   fancy_echo "Installing dotfiles ..."
   mkdir -p "$HOME/code/jaisonerick"
   gh repo clone jaisonerick/dotfiles "$HOME/code/jaisonerick/dotfiles"
-  gh repo clone jaisonerick/dotfiles-pvt "$HOME/code/jaisonerick/dotfiles-pvt"
+else
+  if [[ -n "$(cd "$HOME/code/jaisonerick/dotfiles" && git status --porcelain --untracked-files=normal)" ]]; then
+    echo "Changed files in "$HOME/code/jaisonerick/dotfiles". Skipping auto-update "
+  else
+    (cd "$HOME/code/jaisonerick/dotfiles" && git pull)
+  fi
 fi
 
-(cd "$HOME/code/jaisonerick/dotfiles" && git pull)
-(cd "$HOME/code/jaisonerick/dotfiles-pvt" && git pull)
+if [ ! -d "$HOME/code/jaisonerick/dotfiles-pvt" ]; then
+  fancy_echo "Installing dotfiles-pvt ..."
+  mkdir -p "$HOME/code/jaisonerick"
+  gh repo clone jaisonerick/dotfiles-pvt "$HOME/code/jaisonerick/dotfiles-pvt"
+else
+  if [[ -n "$(cd "$HOME/code/jaisonerick/dotfiles-pvt" && git status --porcelain --untracked-files=normal)" ]]; then
+    echo "Changed files in "$HOME/code/jaisonerick/dotfiles-pvt". Skipping auto-update "
+  else
+    (cd "$HOME/code/jaisonerick/dotfiles-pvt" && git pull)
+  fi
+fi
 
 if [ -d "$HOME/code/jaisonerick/dotfiles" ]; then
   fancy_echo "Updating rc files..."
   env RCRC=$HOME/code/jaisonerick/dotfiles/rcrc rcup
 fi
 
-# reset -Q
+reset -Q
 
 fancy_echo "Setting your mac... You may be requested for your sudo pass"
+
+
+open_full_disk_access_pane() {
+  # Works on many macOS versions; if it fails, the printed instructions still help.
+  open "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles" 2>/dev/null || true
+}
+
+print_full_disk_access_instructions() {
+  local host_app
+  host_app="$(detect_host_app)"
+  cat >&2 <<EOF
+Permission issue: macOS is denying access to Safari's container (TCC privacy).
+
+Fix:
+1) Open System Settings → Privacy & Security → Full Disk Access
+2) Enable Full Disk Access for ${host_app}
+3) Quit and reopen ${host_app}
+4) Re-run this script
+
+Tip: I attempted to open the Full Disk Access pane for you.
+EOF
+}
+
+ensure_full_disk_access() {
+  ls "$HOME/Library/Containers/com.apple.Safari" >/dev/null 2>&1
+  rc=$?
+  if [[ $rc -ne 0 ]]; then
+    open_full_disk_access_pane
+    print_full_disk_access_instructions
+    return 1
+  fi
+  return 0
+}
+
+ensure_full_disk_access || exit 1
 
 # COMPUTER_NAME="Deathstar"
 # Set computer name
